@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#0b0718">
+  <title>Coin Cash</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:#090614;color:#fff;font-family:Arial,"Noto Sans Bengali",sans-serif}
+    body{min-height:100vh}
+    button{font:inherit}
+    .app{width:100%;max-width:520px;margin:auto;min-height:100vh;background:linear-gradient(180deg,#100a22 0%,#090614 100%);padding-bottom:86px}
+    .top{padding:18px 16px 10px;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:11px}
+    .logo{width:45px;height:45px;border-radius:14px;background:linear-gradient(135deg,#ffd84a,#b87808);display:grid;place-items:center;color:#211400;font-size:24px;font-weight:900;box-shadow:0 8px 25px #d39a2438}
+    .brand h1{font-size:20px;margin:0;font-weight:800}
+    .brand small{display:block;color:#a9a2bb;font-size:11px;margin-top:3px}
+    .tg{border:1px solid #3a3150;background:#171128;color:#dcd7e9;border-radius:12px;padding:8px 10px;font-size:12px}
+    .notice{margin:6px 14px 12px;background:#18102b;border:1px solid #3a2a52;border-radius:13px;padding:10px 12px;overflow:hidden;color:#f6df87;font-size:12px}
+    .ticker{white-space:nowrap;display:inline-block;animation:move 15s linear infinite}
+    @keyframes move{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+    .balance{margin:0 14px 14px;padding:20px;border-radius:20px;background:linear-gradient(135deg,#2a1750,#15102a);border:1px solid #4b3470;box-shadow:0 15px 35px #0005}
+    .label{color:#bcb4cd;font-size:12px}
+    .money{font-size:35px;font-weight:900;color:#ffd84a;margin:5px 0 14px}
+    .balance-row{display:flex;justify-content:space-between;align-items:end}
+    .mini{font-size:11px;color:#9f97b2}
+    .activate{margin:0 14px 14px;padding:16px;border-radius:18px;background:linear-gradient(135deg,#24123e,#130d23);border:1px solid #5a3b7f}
+    .activate b{display:block;margin-bottom:5px}
+    .activate p{margin:0 0 12px;color:#bcb4c8;font-size:12px;line-height:1.5}
+    .primary{width:100%;border:0;border-radius:13px;padding:13px;background:linear-gradient(135deg,#ffd84a,#d99b20);color:#211400;font-weight:900;cursor:pointer}
+    .section{padding:0 14px;margin:18px 0 9px;font-size:15px;font-weight:800}
+    .grid{padding:0 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .card{border:1px solid #302542;background:#151022;border-radius:17px;padding:15px;min-height:110px;text-align:left;color:#fff;cursor:pointer}
+    .card:active,.primary:active,.navbtn:active{transform:scale(.98)}
+    .ico{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;background:#24173a;color:#ffd84a;font-size:20px;margin-bottom:9px}
+    .card b{font-size:13px}
+    .card span{display:block;color:#948ca4;font-size:10px;margin-top:4px}
+    .page{display:none;padding-bottom:20px}
+    .page.active{display:block}
+    .back{margin:8px 14px 14px;color:#c9c0d8;font-size:13px;cursor:pointer}
+    .panel{margin:0 14px;padding:18px;border:1px solid #332746;background:#151022;border-radius:18px}
+    .panel h2{margin:0 0 6px;font-size:19px}
+    .panel p{margin:0 0 15px;color:#a9a1b4;font-size:12px;line-height:1.6}
+    .input{width:100%;border:1px solid #3b2d4f;background:#0f0a1b;color:#fff;border-radius:12px;padding:13px;margin:7px 0;outline:none}
+    .amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 12px}
+    .amount{border:1px solid #3b2d4f;background:#110b1d;color:#ddd;border-radius:10px;padding:10px 4px;cursor:pointer}
+    .amount.selected{background:#3c2a11;border-color:#dca82e;color:#ffd84a}
+    .method{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+    .method button{padding:11px;border-radius:11px;border:1px solid #3b2d4f;background:#110b1d;color:#ddd}
+    .method button.selected{border-color:#dca82e;background:#3c2a11;color:#ffd84a}
+    .video{margin:0 14px;border-radius:18px;overflow:hidden;background:#030303;height:510px;position:relative;border:1px solid #302542}
+    .video-bg{height:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,#4d237c,#0b0612 55%,#000)}
+    .play{width:66px;height:66px;border-radius:50%;background:#ffd84a;color:#201500;display:grid;place-items:center;font-size:28px}
+    .video-info{position:absolute;left:15px;right:15px;bottom:15px}
+    .video-info b{font-size:15px}.video-info p{font-size:11px;color:#d1cadb;margin:5px 0}
+    .reward{color:#ffd84a;font-weight:800}
+    .bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;height:72px;background:#100b1bfa;border-top:1px solid #2e2540;display:flex;justify-content:space-around;align-items:center;z-index:10}
+    .navbtn{border:0;background:none;color:#81788f;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+    .navbtn span{font-size:20px}.navbtn.active{color:#ffd84a}
+    .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(15px);background:#241a32;border:1px solid #55406e;color:#fff;padding:11px 15px;border-radius:12px;font-size:12px;opacity:0;pointer-events:none;transition:.25s;z-index:20;max-width:90%;text-align:center}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .stat{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #292039;font-size:13px}.stat:last-child{border-bottom:0}
+    .gold{color:#ffd84a}
+    .copy{margin-top:8px;border:1px solid #443255;background:#100a19;color:#dcd4e5;border-radius:10px;padding:10px;width:100%;text-align:left;font-size:11px}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div id="homePage" class="page active">
+    <header class="top">
+      <div class="brand">
+        <div class="logo">₿</div>
+        <div><h1>Coin Cash</h1><small>ভিডিও দেখুন • কয়েন আয় করুন</small></div>
+      </div>
+      <button class="tg" onclick="openTelegram()">Telegram</button>
+    </header>
+
+    <div class="notice"><div class="ticker">📢 Coin Cash-এ স্বাগতম! অ্যাকাউন্ট সক্রিয় করে ভিডিও দেখে কয়েন আয় করুন।</div></div>
+
+    <div class="balance">
+      <div class="label">আপনার ব্যালেন্স</div>
+      <div class="money" id="balance">৳0</div>
+      <div class="balance-row"><div class="mini">1 Coin = ৳1</div><div class="mini" id="statusText">অ্যাকাউন্ট সক্রিয় নয়</div></div>
+    </div>
+
+    <div class="activate" id="activationBox">
+      <b>🔐 অ্যাকাউন্ট অ্যাক্টিভেশন</b>
+      <p>Coin Cash ব্যবহার শুরু করতে একবার <strong>৳150</strong> অ্যাক্টিভেশন সম্পন্ন করতে হবে।</p>
+      <button class="primary" onclick="showPage('activationPage')">অ্যাক্টিভেট করুন</button>
+    </div>
+
+    <div class="section">আয় করার সুযোগ</div>
+    <div class="grid">
+      <button class="card" onclick="showPage('videosPage')"><div class="ico">▶</div><b>ভিডিও দেখে ইনকাম</b><span>Short video দেখুন</span></button>
+      <button class="card" onclick="showPage('referralPage')"><div class="ico">👥</div><b>রেফার করে ইনকাম</b><span>নিজের লিংক শেয়ার করুন</span></button>
+      <button class="card" onclick="showPage('withdrawPage')"><div class="ico">৳</div><b>উইথড্র</b><span>ন্যূনতম ১টি valid referral</span></button>
+      <button class="card" onclick="showPage('profilePage')"><div class="ico">👤</div><b>প্রোফাইল</b><span>অ্যাকাউন্ট তথ্য দেখুন</span></button>
+      <button class="card" onclick="showPage('supportPage')"><div class="ico">💬</div><b>সাপোর্ট</b><span>Telegram Support</span></button>
+      <button class="card" onclick="showPage('adsPage')"><div class="ico">🎁</div><b>Ad Reward</b><span>অনুমোদিত rewarded ad</span></button>
+    </div>
+  </div>
+
+  <div id="activationPage" class="page">
+    <div class="back" onclick="showPage('homePage')">‹ ফিরে যান</div>
+    <div class="panel">
+      <h2>🔐 অ্যাকাউন্ট অ্যাক্টিভেশন</h2>
+      <p>অ্যাক্টিভেশন ফি <strong class="gold">৳150</strong>। পেমেন্ট সম্পন্ন করার পর আপনার ট্রানজেকশন তথ্য দিয়ে আবেদন পাঠান।</p>
+      <div class="stat"><span>অ্যাক্টিভেশন ফি</span><b class="gold">৳150</b></div>
+      <input id="txid" class="input" placeholder="Transaction ID লিখুন">
+      <input id="payFrom" class="input" placeholder="যে নম্বর থেকে পেমেন্ট করেছেন">
+      <button class="primary" onclick="submitActivation()">অ্যাক্টিভেশন আবেদন পাঠান</button>
+      <p style="margin-top:12px;font-size:10px">নোট: পেমেন্ট নম্বর ও পেমেন্ট নির্দেশনা Admin Panel থেকে সেট করা উচিত।</p>
+    </div>
+  </div>
+
+  <div id="videosPage" class="page">
+    <div class="back" onclick="showPage('homePage')">‹ ফিরে যান</div>
+    <div class="video">
+      <div class="video-bg"><div class="play" onclick="watchVideo()">▶</div></div>
+      <div class="video-info">
+        <b>আজকের ভিডিও</b>
+        <p>ভিডিও দেখুন এবং নির্ধারিত reward পাওয়ার জন্য সম্পূর্ণ ভিডিও দেখুন।</p>
+        <div class="reward" id="videoReward">Reward: -- Coin</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="referralPage" class="page">
+    <div class="back" onclick="showPage('homePage')">‹ ফিরে যান</div>
+    <div class="panel">
+      <h2>👥 Referral</h2>
+      <p>আপনার আলাদা referral link শেয়ার করুন। Valid referral-এর শর্ত Admin Panel থেকে নির্ধারিত হবে।</p>
+      <input id="refLink" class="input" readonly>
+      <button class="copy" onclick="copyReferral()">📋 Referral link কপি করুন</button>
+      <div style="height:12px"></div>
+      <div class="stat"><span>Valid Referrals</span><b id="refs" class="gold">0</b></div>
+      <div class="stat"><span>উইথড্র করার শর্ত</span><b>কমপক্ষে ১টি valid referral</b></div>
+    </div>
+  </div>
+
+  <div id="withdrawPage" class="page">
+    <div class="back" onclick="showPage('homePage')">‹ ফিরে যান</div>
+    <div class="panel">
+      <h2>💸 Withdraw</h2>
+      <p>উইথড্র করতে কমপক্ষে ১টি valid referral থাকতে হবে। আপনার balance অনুযায়ী amount নির্বাচন করুন।</p>
+      <div class="amounts" id="amounts">
+        <button class="amount" onclick="selectAmount(this,100)">৳100</button>
+        <button class="amount" onclick="selectAmount(this,200)">৳200</button>
+        <button class="amount" onclick="selectAmount(this,300)">৳300</button>
+        <button class="amount" onclick="selectAmount(this,500)">৳500</button>
+        <button class="amount" onclick="selectAmount(this,1000)">৳1000</button>
+        <button class="amount" onclick="selectAmount(this,2000)">৳2000</button>
+        <button class="amount" onclick="selectAmount(this,3000)">৳3000</button>
+        <button class="amount" onclick="selectAmount(this,5000)">৳5000</button>
+      </div>
+      <div class="method">
+        <button onclick="selectMethod(this,'bKash')">bKash</button>
+        <button onclick="selectMethod(this,'Nagad')">Nagad</button>
+      </div>
+      <input id="withdrawNumber" class="input" inputmode="numeric" placeholder="আপনার bKash/Nagad নম্বর">
+      <button class="primary" onclick="submitWithdraw()">উইথড্র আবেদন করুন</button>
+    </div>
+  </div>
+
+  <div id="adsPage" class="page">
+    <div class="back" onclick="showPage('homePage')">‹ ফিরে যান</div>
+    <div class="panel">
+      <h2>🎁 Ad Reward</h2>
+      <p>Rewarded ads শুধুমাত্র অনুমোদিত ad network এবং তাদের policy অনুযায়ী যুক্ত করা যাবে।</p>
+      <div class="stat"><span>আজকের Reward</span><b class="gold" id="adReward">0 Coin</b></div>
+      <button class="primary" onclick="startAd()">Rewarded Ad চালু করুন</button>
+    </div>
+  </div>
+
+  <div id="profilePage" class="page">
+    <div class="back" onclick="showPage('homePage')">‹ ফিরে যান</div>
+    <div class="panel">
+      <h2>👤 Profile</h2>
+      <div class="stat"><span>Telegram User</span><b id="userName">Guest</b></div>
+      <div class="stat"><span>Balance</span><b class="gold" id="profileBalance">৳0</b></div>
+      <div class="stat"><span>Account Status</span><b id="profileStatus">Not Active</b></div>
+    </div>
+  </div>
+
+  <div id="supportPage" class="page">
+    <div class="back" onclick="showPage('homePage')">‹ ফিরে যান</div>
+    <div class="panel">
+      <h2>💬 Telegram Support</h2>
+      <p>অ্যাকাউন্ট, পেমেন্ট, referral বা withdrawal সংক্রান্ত সমস্যায় Telegram Support-এ যোগাযোগ করুন।</p>
+      <button class="primary" onclick="openSupport()">Support খুলুন</button>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <button class="navbtn active" onclick="showPage('homePage',this)"><span>⌂</span>Home</button>
+    <button class="navbtn" onclick="showPage('videosPage',this)"><span>▶</span>Videos</button>
+    <button class="navbtn" onclick="showPage('referralPage',this)"><span>👥</span>Referral</button>
+    <button class="navbtn" onclick="showPage('withdrawPage',this)"><span>৳</span>Withdraw</button>
+    <button class="navbtn" onclick="showPage('profilePage',this)"><span>👤</span>Profile</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  const state = {
+    balance: Number(localStorage.getItem('cc_balance') || 0),
+    activated: localStorage.getItem('cc_activated') === '1',
+    refs: Number(localStorage.getItem('cc_refs') || 0),
+    amount: 0,
+    method: ''
+  };
+
+  function tgUser(){
+    try{
+      const u = window.Telegram?.WebApp?.initDataUnsafe?.user;
+      if(u) return u;
+    }catch(e){}
+    return null;
+  }
+
+  function init(){
+    try{ Telegram.WebApp.ready(); Telegram.WebApp.expand(); }catch(e){}
+    const u = tgUser();
+    document.getElementById('userName').textContent = u ? (u.first_name || u.username || 'Telegram User') : 'Guest';
+    const username = u && u.username ? u.username : 'user';
+    document.getElementById('refLink').value = 'https://t.me/CoinCashBot?startapp=ref_' + username;
+    refresh();
+  }
+
+  function refresh(){
+    document.getElementById('balance').textContent = '৳' + state.balance;
+    document.getElementById('profileBalance').textContent = '৳' + state.balance;
+    document.getElementById('refs').textContent = state.refs;
+    document.getElementById('statusText').textContent = state.activated ? 'অ্যাকাউন্ট সক্রিয়' : 'অ্যাকাউন্ট সক্রিয় নয়';
+    document.getElementById('profileStatus').textContent = state.activated ? 'Active' : 'Not Active';
+    document.getElementById('activationBox').style.display = state.activated ? 'none' : 'block';
+  }
+
+  function save(){
+    localStorage.setItem('cc_balance', state.balance);
+    localStorage.setItem('cc_activated', state.activated ? '1' : '0');
+    localStorage.setItem('cc_refs', state.refs);
+  }
+
+  function showPage(id, el){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+    if(el) el.classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  function toast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg;t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2500);
+  }
+
+  function submitActivation(){
+    const tx=document.getElementById('txid').value.trim();
+    const from=document.getElementById('payFrom').value.trim();
+    if(!tx || !from){toast('Transaction ID ও পেমেন্ট নম্বর দিন।');return;}
+    toast('আবেদন গ্রহণ করা হয়েছে। Admin verification প্রয়োজন।');
+  }
+
+  function watchVideo(){
+    if(!state.activated){toast('আগে অ্যাকাউন্ট অ্যাক্টিভ করুন।');showPage('activationPage');return;}
+    const reward=1;
+    document.getElementById('videoReward').textContent='Reward: '+reward+' Coin';
+    toast('ভিডিও reward server verification-এর পর যোগ হবে।');
+  }
+
+  function copyReferral(){
+    const v=document.getElementById('refLink').value;
+    navigator.clipboard?.writeText(v).then(()=>toast('Referral link কপি হয়েছে।')).catch(()=>toast(v));
+  }
+
+  function selectAmount(btn,n){
+    document.querySelectorAll('.amount').forEach(x=>x.classList.remove('selected'));
+    btn.classList.add('selected');state.amount=n;
+  }
+
+  function selectMethod(btn,m){
+    document.querySelectorAll('.method button').forEach(x=>x.classList.remove('selected'));
+    btn.classList.add('selected');state.method=m;
+  }
+
+  function submitWithdraw(){
+    if(!state.activated){toast('অ্যাকাউন্ট অ্যাক্টিভ করুন।');return;}
+    if(state.refs<1){toast('উইথড্র করতে অন্তত ১টি valid referral প্রয়োজন।');return;}
+    if(!state.amount){toast('উইথড্র amount নির্বাচন করুন।');return;}
+    if(state.amount>state.balance){toast('আপনার balance পর্যাপ্ত নয়।');return;}
+    if(!state.method){toast('bKash অথবা Nagad নির্বাচন করুন।');return;}
+    const num=document.getElementById('withdrawNumber').value.trim();
+    if(!num){toast('উইথড্র নম্বর দিন।');return;}
+    toast('Withdrawal request server verification-এর জন্য পাঠানো হয়েছে।');
+  }
+
+  function startAd(){
+    if(!state.activated){toast('আগে অ্যাক্টিভেশন সম্পন্ন করুন।');return;}
+    toast('Ad network যুক্ত হলে এখানে real rewarded ad চালু হবে।');
+  }
+
+  function openSupport(){
+    const url='https://t.me/';
+    try{Telegram.WebApp.openTelegramLink(url)}catch(e){window.open(url,'_blank')}
+  }
+
+  function openTelegram(){
+    try{Telegram.WebApp.openTelegramLink('https://t.me/') }catch(e){}
+  }
+
+  init();
+</script>
+</body>
+</html>
